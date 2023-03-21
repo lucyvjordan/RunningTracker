@@ -7,7 +7,6 @@ from  matplotlib.dates import MonthLocator, DateFormatter
 from matplotlib.widgets import RadioButtons, Cursor
 
 
-
 def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles):
 
     Selections = [Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles]
@@ -20,9 +19,8 @@ def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, Avg
     # puts empty space to the left of the plot so that the buttons can go there
 
 
-    converted_dates = list(map(datetime.datetime.strptime, Dates, len(Dates)*['%m/%d/%Y']))
+    converted_dates = list(map(datetime.datetime.strptime, Dates, len(Dates)*['%d/%m/%Y']))
     # converts the date strings to date objects
-    print(converted_dates)
 
     plot, = ax.plot(converted_dates, Selections[0], marker = 'o', mfc = 'w', linestyle = 'dashed')
     # plots the points

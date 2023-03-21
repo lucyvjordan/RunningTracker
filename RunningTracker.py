@@ -56,6 +56,8 @@ class Menu(tk.Tk):
         self.combobox.bind('<<ComboboxSelected>>', self.changeColours)
         # when the value in the box is changed, a function is called which changes all the colours of the widgets
 
+        self.error = tk.Message(master=self.side_frame, text="", font=("Georgia", 10), bg="#e6e6e6", foreground = "red", borderwidth=5, anchor = "center")
+        self.error.pack(fill="x", padx=5, pady=5)
 
         self.main_frame = tk.Frame(master=self, background=self.frontColour)
         self.main_frame.grid(row=1, column=1, padx=5, pady=5, rowspan=3, sticky="nsew") # the rowspan is set to 3 so it fills up the whole of the screen vertically
@@ -72,7 +74,7 @@ class Menu(tk.Tk):
         self.description.grid(padx=5, pady=5, row=0, column=0, columnspan=2, sticky="ew")
         # this message outlines the functions of the program to the user
 
-        self.bind("<Configure>", self.resize_description)
+        self.bind("<Configure>", self.resize_messages)
         # when the size of the window is changed, the resize_description function is called to change the width of the text in the box
 
         self.run_label = ttk.Label(master=self.main_frame, text=("Data for Run %s:" %(str(len(self.runs) + 1))), font = ("Georgia", 12, 'underline'), style='Label.TLabel', borderwidth = 5, anchor="center")
@@ -83,7 +85,7 @@ class Menu(tk.Tk):
         self.date_label.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
 
-        self.date = DateEntry(master=self.main_frame, background='#d1d1e0', foreground = "black") 
+        self.date = DateEntry(master=self.main_frame, background='#d1d1e0', foreground = "black", date_pattern = "dd-mm-yy") 
         # allows the user to enter the date of the run
         # i would like to change this so it is default to the current date
         self.date.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
@@ -94,7 +96,7 @@ class Menu(tk.Tk):
 
         vcmd = (self.register(self.validate))        
         # creates a validate command, the validate function is run when this command is used
-        self.distance = tk.Entry(master=self.main_frame, validate="key", validatecommand=(vcmd,'%P'))
+        self.distance = tk.Entry(master=self.main_frame, validate="key", validatecommand=(vcmd, "distance", '%P'))
         # the validate command is used when the user tries to enter text, the function makes sure only numbers are entered
         self.distance.grid(row=3, column=1, padx=5, pady=5, sticky="nsew")
     
@@ -107,15 +109,17 @@ class Menu(tk.Tk):
         self.duration_label = ttk.Label(master=self.main_frame, text="Duration (minutes):", font=("Georgia", 10), style='Label.TLabel', borderwidth = 5)
         self.duration_label.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
 
-        self.duration = tk.Entry(master=self.main_frame, validate="key", validatecommand=(vcmd,'%P'))
+        self.duration = tk.Entry(master=self.main_frame, validate="key", validatecommand=(vcmd, "duration", '%P'))
         self.duration.grid(row=5, column=1, padx=5, pady=5, sticky="nsew")
     
         self.bottom_buttons = Buttons(master=self.main_frame, add="Add Data Point", show="Show Graph")
         self.bottom_buttons.grid(row=6, column=0, padx=5, pady=5, columnspan=2, sticky="nsew")
         # more buttons, fills the frame horizontally
     
-    def resize_description(self, event):
+
+    def resize_messages(self, event):
         self.description.configure(width= (self.description.winfo_width() - 15))
+        self.error.configure(width= (self.error.winfo_width() - 15))
         # changes the width of the text in the description box dynamically depending on the size of the widget after resizing the window
 
 
@@ -158,11 +162,24 @@ class Menu(tk.Tk):
             button.configure(background=self.backColour, foreground = self.textColour)
         # goes through each button in the both button frames, means that i dont need to know how many buttons are in each
 
-    def validate(self, text):
-        if text.isnumeric() or text == "": # checking whether it is "" allows users to backspace the first character
+    def validate(self, entry, text):
+        if text == "":
+            return True
+            # checking whether it is "" allows users to backspace the first character
+        
+        if text[-1] == ".":
+            # if they are trying to enter a decimal point
+            if text.count(".") == 1 and text != "." and entry == "distance":
+                # only allowed to enter if there is no decimal point yet, it is not the first character entered and it is in the distance field
+                if len(text) < 5:
+                    # ensures the decimal point isnt the final character
+                    return True
+        
+        if text[-1].isnumeric():
             if len(text) < 6:
             # if the text attempting to be entered is an integer, and the text in the box is less than 6 characters long, then it is allowed to enter
                 return True
+        
         return False
 
 
@@ -202,7 +219,7 @@ class Buttons(tk.Frame):
         elif action == "quit":
             quit()
         elif action == "add":
-            if menu.distance.get() == "" or menu.duration.get() == "" or menu.distance.get()[0] == "0" or menu.duration.get()[0] == "0":
+            if menu.distance.get() == "" or menu.duration.get() == "" or menu.distance.get()[0] == "0" or menu.duration.get()[0] == "0" or menu.distance.get()[-1] == ".":
                 # if either data entry is empty or starts with a 0 then the run is not added
                 return
             if menu.var.get() == 1:
@@ -218,7 +235,14 @@ class Buttons(tk.Frame):
             # this clears the entry boxes
 
         elif action == "show":
-            GenerateData.WriteData(menu.runs, "new")
+
+            if len(menu.runs) < 2: 
+                menu.error.configure(text = "Please enter more runs before you generate your graph")
+                return
+
+            self.filename = filedialog.asksaveasfilename(initialdir=sys.path[0], defaultextension='.csv', filetypes = [("CSV File", ".csv")])
+
+            GenerateData.WriteData(self.filename, menu.runs, "new")
         
 
 
