@@ -11,7 +11,8 @@ class Menu(tk.Tk):
         super().__init__()
 
         self.runs = []
-        # array will store all runs added
+        # array will store all runs added        
+        self.filename = ""
 
         self.frontColour = "#e6e6e6"
         self.backColour = "white"
@@ -56,6 +57,9 @@ class Menu(tk.Tk):
         self.combobox.bind('<<ComboboxSelected>>', self.changeColours)
         # when the value in the box is changed, a function is called which changes all the colours of the widgets
 
+        self.appending = tk.Message(master=self.side_frame, text="", font = ("Georgia", 10), bg= "#e6e6e6", foreground=self.textColour, borderwidth=5, anchor="center")
+        self.appending.pack(fill="x", padx=5, pady=5)
+
         self.error = tk.Message(master=self.side_frame, text="", font=("Georgia", 10), bg="#e6e6e6", foreground = "red", borderwidth=5, anchor = "center")
         self.error.pack(fill="x", padx=5, pady=5)
 
@@ -67,8 +71,7 @@ class Menu(tk.Tk):
         self.main_frame.grid_columnconfigure((0,1), weight=1)
         # sets the columns and rows to expand if there is empty space
 
-    
-    
+
         self.description = tk.Message(master=self.main_frame, text="Welcome to the Running Tracker!\nWhen you have finished entering your data, click 'Show Graph' to see your progress plotted against multiple statistics! Next time, simply press 'Load Graph' to continue tracking your runs.", font=("Georgia", 9), bg="#d1d1e0", foreground = self.textColour, 
         borderwidth = 5)
         self.description.grid(padx=5, pady=5, row=0, column=0, columnspan=2, sticky="ew")
@@ -120,6 +123,7 @@ class Menu(tk.Tk):
     def resize_messages(self, event):
         self.description.configure(width= (self.description.winfo_width() - 15))
         self.error.configure(width= (self.error.winfo_width() - 15))
+        self.appending.configure(width= (self.error.winfo_width() - 15))
         # changes the width of the text in the description box dynamically depending on the size of the widget after resizing the window
 
 
@@ -151,6 +155,8 @@ class Menu(tk.Tk):
         self.description.configure(background = self.purpleBackground, foreground = self.textColour)
         self.bottom_buttons.configure(background=self.purpleBackground)
         self.side_buttons.configure(background=self.purpleBackground)
+        self.error.configure(background=self.frontColour)
+        self.appending.configure(background=self.frontColour)
     
         self.labelstyle.configure('Label.TLabel', background=self.frontColour, foreground=self.textColour)
         self.radiostyle.configure('Radio.TRadiobutton', background=self.frontColour, foreground=self.textColour)
@@ -209,15 +215,22 @@ class Buttons(tk.Frame):
     def actions(self, action):
         # this function contains the processes that occur when a button is pressed
         if action == "new":
+            menu.filename = ""
             menu.runs = []
             menu.run_label.configure(text=("Data for Run %s:" %(str(len(menu.runs) + 1))))
-        
-        elif action == "load":
-            self.filename = filedialog.askopenfilename(initialdir=sys.path[0], title="Select A File", filetypes=(("csv files", "*.csv"),))
-            GenerateData.ReadData(self.filename)
+            menu.appending.configure(text="")  
+            menu.error.configure(text="") 
 
+        elif action == "load":
+            menu.filename = filedialog.askopenfilename(initialdir=sys.path[0], title="Select A File", filetypes=(("csv files", "*.csv"),))
+            menu.runs = []
+            menu.run_label.configure(text=("Data for Run %s:" %(str(len(menu.runs) + 1))))
+            menu.appending.configure(text="Appending to file: '%s'" % (menu.filename.split('/')[-1]))
+            menu.error.configure(text="") 
+        
         elif action == "quit":
             quit()
+
         elif action == "add":
             if menu.distance.get() == "" or menu.duration.get() == "" or menu.distance.get()[0] == "0" or menu.duration.get()[0] == "0" or menu.distance.get()[-1] == ".":
                 # if either data entry is empty or starts with a 0 then the run is not added
@@ -229,20 +242,21 @@ class Buttons(tk.Frame):
                 menu.runs.append([menu.date.get(), menu.distance.get() + "miles", menu.duration.get()])
             menu.run_label.configure(text=("Data for Run %s:" %(str(len(menu.runs) + 1))))
             # the text on screen which says which run is being entered for is updated
-
+            menu.error.configure(text="") 
             menu.distance.delete(0, "end")
             menu.duration.delete(0, "end")
             # this clears the entry boxes
 
         elif action == "show":
-
-            if len(menu.runs) < 2: 
+            if len(menu.runs) < 2 and menu.filename == "": 
                 menu.error.configure(text = "Please enter more runs before you generate your graph")
                 return
-
-            self.filename = filedialog.asksaveasfilename(initialdir=sys.path[0], defaultextension='.csv', filetypes = [("CSV File", ".csv")])
-
-            GenerateData.WriteData(self.filename, menu.runs, "new")
+            
+            if menu.filename == "":
+                menu.filename = filedialog.asksaveasfilename(initialdir=sys.path[0], defaultextension='.csv', filetypes = [("CSV File", ".csv")])
+                GenerateData.WriteData(menu.filename, menu.runs, "new")
+            
+            GenerateData.WriteData(menu.filename, menu.runs, "append")
         
 
 

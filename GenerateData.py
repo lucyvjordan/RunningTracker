@@ -2,6 +2,7 @@ import os, sys, csv
 import pandas as pd
 import ShowGraph
 
+
 def WriteData(filename, data, method):
 
 
@@ -62,14 +63,15 @@ def ReadData(filename):
             newDates.append(newDate)
     print(newDates)
 
-    Distances = dataset['Distance KM']
+
+    DistancesKM = dataset['Distance KM']
     DistancesMiles = dataset['Distance Miles']
     Durations = dataset['Duration']
     AvgPacesKM = dataset['Avg Pace KM']
     AvgPacesMiles = dataset['Avg Pace Miles']
     AvgSpeedsKMH = dataset['Avg Speed KMH']
     AvgSpeedsMPH = dataset['Avg Speed MPH']
-    ShowGraph.run(newDates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles)
+    ShowGraph.run(newDates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles)
 
 
 def ConvertDates(data):
@@ -85,7 +87,7 @@ def ConvertKM(data):
     newdata = []
     for entry in data:
         if "miles" in entry[1]:
-            distancemiles = int(entry[1].split('miles')[0])
+            distancemiles = float(entry[1].split('miles')[0])
             distancekm = distancemiles * 1.609344
         else:
 

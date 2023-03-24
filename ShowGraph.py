@@ -7,9 +7,9 @@ from  matplotlib.dates import MonthLocator, DateFormatter
 from matplotlib.widgets import RadioButtons, Cursor
 
 
-def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles):
+def run(Dates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles):
 
-    Selections = [Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles]
+    Selections = [Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, AvgPacesMiles]
     # so that the values plotted on the y-axis can be changed
 
     fig, ax = plt.subplots(figsize = (10,5), dpi = 100, num="Running Tracker")
@@ -39,15 +39,16 @@ def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, Avg
 
     print(plot.get_ydata())
     average = round(sum(plot.get_ydata())/len(plot.get_ydata()),2)
-    fig.text(0.025,0.2,"The average duration is " + str(average) + " minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
+    fig.text(0.025,0.3,"The average duration is " + str(average) + " minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
     # finds the average for the y-attribute chosen and displays it to screen
 
     ax.xaxis.set_major_locator(MonthLocator())
     ax.xaxis.set_major_formatter(DateFormatter('%d-%m-%Y'))
     # formats x-axis by months
 
-    buttonsloc = plt.axes([0.05, 0.4, 0.25, 0.5], facecolor='White')
-    buttons = RadioButtons(buttonsloc, ('Durations (Minutes)', 'Distances (km)', 'Average Speeds (km/h)', 'Average Speeds (mph)', 'Average Paces (min/km)', 'Average Paces (min/mile)'), active = 0)
+
+    databuttonsloc = plt.axes([0.05, 0.4, 0.25, 0.5], facecolor='White')
+    databuttons = RadioButtons(databuttonsloc, ('Durations (minutes)', 'Distances (km)', 'Distances (miles)', 'Average Speeds (km/h)', 'Average Speeds (mph)', 'Average Paces (min/km)', 'Average Paces (min/mile)'), active = 0)
     # creates and shows buttons so the user can choose what y-attribute is shown
 
     cursor = Cursor(ax, horizOn= True, vertOn= True, useblit= True, color = 'r', linewidth = 1 )
@@ -98,8 +99,9 @@ def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, Avg
 
     def drawGraph(label):
 
-        labeldict = {'Durations (Minutes)': Durations,
-        'Distances (km)': Distances, 
+        labeldict = {'Durations (minutes)': Durations,
+        'Distances (km)': DistancesKM,
+        'Distances (miles)': DistancesMiles, 
         'Average Speeds (km/h)': AvgSpeedsKMH, 
         'Average Speeds (mph)': AvgSpeedsMPH, 
         'Average Paces (min/km)': AvgPacesKM, 
@@ -113,12 +115,15 @@ def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, Avg
         average = round(sum(plot.get_ydata())/len(plot.get_ydata()),2)    
         # the average for the y data is found
 
-        if label == "Durations (Minutes)":
+        if label == "Durations (minutes)":
             # each if statement changes the average displayed
             fig.text(0.025,0.2,"The average duration is " + str(average) + " minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
         
         elif label == "Distances (km)":
             fig.text(0.025,0.2,"The average distance is " + str(average) + "km.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
+
+        elif label == "Distances (miles)":
+            fig.text(0.025,0.2,"The average distance is " + str(average) + " miles.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
     
         elif label == "Average Speeds (km/h)":
             fig.text(0.025,0.2,"The average speed is " + str(average) + "km/h.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
@@ -144,7 +149,7 @@ def run(Dates, Durations, Distances, AvgSpeedsKMH, AvgSpeedsMPH, AvgPacesKM, Avg
         # the graph is updated with the changes
 
 
-    buttons.on_clicked(drawGraph)
+    databuttons.on_clicked(drawGraph)
     # when a button is clicked, the drawGraph function is called
 
     plt.show()
