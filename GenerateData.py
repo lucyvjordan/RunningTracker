@@ -41,26 +41,21 @@ def AppendData(filename, data):
 
 def ReadData(filename):
     dataset = pd.read_csv(os.path.join(sys.path[0], filename), index_col=0)
+    dataset.index = pd.to_datetime(dataset.index, format="%d.%m.%Y")
+
+    dataset = dataset.sort_index()
+
+
     Dates = [str(_) for _ in dataset.index]
-    print(Dates)
+
     newDates = []
     for i in range(len(Dates)):
+
+        Date = Dates[i].split(" ")[0]
         newDate = ""
-        if len(Dates[i]) != 10:
-            print("HI")
-            if len(Dates[i].split('.')[0]) == 1:
-                newDate += ("0" + Dates[i].split('.')[0] + "/")
-            else:
-                newDate += (Dates[i].split('.')[0] + "/")
-            if len(Dates[i].split('.')[1]) == 1:
-                newDate += ("0" + Dates[i].split('.')[1] + "/")
-            else:
-                newDate += (Dates[i].split('.')[1] + "/")
-            if len(Dates[i].split('.')[2]) == 2:
-                newDate += ("20" + Dates[i].split('.')[2])
-            else:
-                newDate += (Dates[i].split('.')[2])
-            newDates.append(newDate)
+        newDate += (Date.split('-')[2] + "/" + Date.split('-')[1] + "/" + Date.split('-')[0])
+        newDates.append(newDate)
+    
     print(newDates)
 
 

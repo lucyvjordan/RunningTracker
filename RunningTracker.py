@@ -88,7 +88,7 @@ class Menu(tk.Tk):
         self.date_label.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
 
-        self.date = DateEntry(master=self.main_frame, background='#d1d1e0', foreground = "black", date_pattern = "dd-mm-yy") 
+        self.date = DateEntry(master=self.main_frame, background='#d1d1e0', foreground = "black", date_pattern = "dd-mm-yyyy") 
         # allows the user to enter the date of the run
         # i would like to change this so it is default to the current date
         self.date.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
