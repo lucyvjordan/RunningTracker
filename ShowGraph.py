@@ -1,9 +1,6 @@
-import os, sys
-import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import datetime
-from  matplotlib.dates import MonthLocator, DateFormatter
 from matplotlib.widgets import RadioButtons, Cursor
 
 
@@ -15,7 +12,6 @@ def run(Dates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMP
     fig, ax = plt.subplots(figsize = (10,5), dpi = 100, num="Running Tracker")
     # defines the subplots, and the window size and title
     plt.subplots_adjust(left=0.4, right = 0.88)
-
     # puts empty space to the left of the plot so that the buttons can go there
 
 
@@ -27,31 +23,27 @@ def run(Dates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMP
 
     fig.autofmt_xdate()
     # rotates dates so they display nicer
+
     plt.tick_params(axis='both', which = 'major', labelsize = 11)
     # sets attributes for axis numbers
+
     plt.ylabel("Durations", fontsize = 14)
     plt.xlabel("Dates", fontsize = 14)
-    ax.set_title("Run Tracker", loc = "center", fontsize = 30, color = 'blue')
+    ax.set_title("Running Tracker", loc = "left", fontsize = 20, color = 'blue')
+    fig.text(0.65, 0.9, "Hover over a point to see exact details!", fontsize = 8, color="black")
     # sets titles for axis and plot
 
     fig.set_facecolor("#ffffcc")
     # changes background colour of plot
 
-    print(plot.get_ydata())
     average = round(sum(plot.get_ydata())/len(plot.get_ydata()),2)
     fig.text(0.025,0.3,"The average duration is " + str(average) + " minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
     # finds the average for the y-attribute chosen and displays it to screen
-
-    ax.xaxis.set_major_locator(MonthLocator())
-    ax.xaxis.set_major_formatter(DateFormatter('%d-%m-%Y'))
-    # formats x-axis by months
 
 
     databuttonsloc = plt.axes([0.05, 0.4, 0.25, 0.5], facecolor='White')
     databuttons = RadioButtons(databuttonsloc, ('Durations (minutes)', 'Distances (km)', 'Distances (miles)', 'Average Speeds (km/h)', 'Average Speeds (mph)', 'Average Paces (min/km)', 'Average Paces (min/mile)'), active = 0)
     # creates and shows buttons so the user can choose what y-attribute is shown
-
-    cursor = Cursor(ax, horizOn= True, vertOn= True, useblit= True, color = 'r', linewidth = 1 )
 
 
     for i in range(len(Dates)):
@@ -66,7 +58,6 @@ def run(Dates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMP
         annot.set_text(text)
         annot.set_visible(True) 
 
-    coord = []
     def onclickpoint(event):
         x = event.xdata
         y = event.ydata
