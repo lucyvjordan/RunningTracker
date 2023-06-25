@@ -40,6 +40,8 @@ def run(Dates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMP
     average = round(sum(plot.get_ydata())/len(plot.get_ydata()),2)
     fig.text(0.025, 0.2,"The average duration is " + str(average) + " minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
     # finds the average for the y-attribute chosen and displays it to screen
+    fig.text(0.025,0.1,"Your best duration is " + str(round(max(plot.get_ydata()), 2)) + "minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
+    
 
 
     databuttonsloc = plt.axes([0.05, 0.4, 0.25, 0.5], facecolor='White')
@@ -87,44 +89,38 @@ def run(Dates, Durations, DistancesKM, DistancesMiles, AvgSpeedsKMH, AvgSpeedsMP
         'Average Paces (min/mile)': AvgPacesMiles}
         # dictionary to link the labels to the equivalent data
 
-        print(label)
+        unitsdict = {'Durations (minutes)': "duration minutes",
+        'Distances (km)': "distance km",
+        'Distances (miles)': "distance miles", 
+        'Average Speeds (km/h)': "speed km/h", 
+        'Average Speeds (mph)': "speed mph", 
+        'Average Paces (min/km)': "pace min/km", 
+        'Average Paces (min/mile)': "pace min/mile"}
+        # so that displaying average and best stats can be done efficienctly with no repitition of code
+
         ax.set_ylabel(label, fontsize = 14)
         plot.set_ydata(labeldict[label])
         # the y-label and data is changed to whichever button was pressed
+
         average = round(sum(plot.get_ydata())/len(plot.get_ydata()),2)    
         # the average for the y data is found
 
-        if label == "Durations (minutes)":
-            # each if statement changes the average displayed
-            fig.text(0.025,0.2,"The average duration is " + str(average) + " minutes.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-        
-        elif label == "Distances (km)":
-            fig.text(0.025,0.2,"The average distance is " + str(average) + "km.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-
-        elif label == "Distances (miles)":
-            fig.text(0.025,0.2,"The average distance is " + str(average) + " miles.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-    
-        elif label == "Average Speeds (km/h)":
-            fig.text(0.025,0.2,"The average speed is " + str(average) + "km/h.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-            
-        elif label == "Average Speeds (mph)":
-            fig.text(0.025,0.2,"The average speed is " + str(average) + "mph.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-            
-        elif label == "Average Paces (min/km)":
-            fig.text(0.025,0.2,"The average pace is " + str(average) + "min/km.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-            
-        elif label == "Average Paces (min/mile)":
-            fig.text(0.025,0.2,"The average pace is " + str(average) + "min/mile.", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
-    
         minyvalue = float(min(plot.get_ydata())) * 0.9
         maxyvalue = float(max(plot.get_ydata())) * 1.1
         ax.set_ylim(minyvalue, maxyvalue)
         # this finds the limits for the y-axis, it will be limited to 10% either side of the data
 
-        del fig.texts[1]  
-        # the average text is deleted to they do not stack on top of each other
-        # the second text is deleted (index 1) because index 0 refers to the text saying "hover over a point..."
+        fig.text(0.025,0.2,"Your average " + unitsdict[label].split()[0] + " is " + str(average) + unitsdict[label].split()[1] + ".", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
+        if label== "Average Paces (min/km)" or label == "Average Paces (min/mile)":
+            fig.text(0.025,0.1,"Your best " + unitsdict[label].split()[0] + " is " + str(round(min(plot.get_ydata()), 2)) + unitsdict[label].split()[1] + ".", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
+        else:
+            fig.text(0.025,0.1,"Your best " + unitsdict[label].split()[0] + " is " + str(round(max(plot.get_ydata()), 2)) + unitsdict[label].split()[1] + ".", fontsize=12, color = 'w', bbox={"facecolor":"b", "alpha":0.5})  
+        # displays average and best for stat chosen
 
+        del fig.texts[1]
+        del fig.texts[1]  
+        # the previous average and best texts are deleted to they do not stack on top of each other
+        # the second text is deleted (index 1) twice because index 0 refers to the text saying "hover over a point..."
         plt.draw()
         # the graph is updated with the changes
 
